@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
 
 namespace IdentityManager
 {
@@ -13,6 +15,9 @@ namespace IdentityManager
 
             builder.Services.AddDbContext<ApplicationDbContext>(options => 
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddIdentity<IdentityUser,IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>(); //??? Identity ???? ?????????? ??? Roles ?? Users? ???? ?? ??? ??????? ?? ????? ????????.
 
             var app = builder.Build();
 
@@ -29,6 +34,7 @@ namespace IdentityManager
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
