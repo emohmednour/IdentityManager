@@ -1,4 +1,7 @@
+using IdentityManager.Models;
+using IdentityManager.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 
@@ -16,9 +19,17 @@ namespace IdentityManager
             builder.Services.AddDbContext<ApplicationDbContext>(options => 
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            builder.Services.AddIdentity<IdentityUser,IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>(); //??? Identity ???? ?????????? ??? Roles ?? Users? ???? ?? ??? ??????? ?? ????? ????????.
+            builder.Services.AddIdentity<ApplicationUser,IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
+            builder.Services.AddTransient<IEmailSender, EmailSender>();
+            builder.Services.Configure<IdentityOptions>(opt =>
+            {
+                opt.Password.RequireDigit = false;
+                opt.Lockout.MaxFailedAccessAttempts = 3;
+                opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                opt.SignIn.RequireConfirmedEmail = false;
+            });
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
